@@ -1,20 +1,19 @@
-<?php
-		
+<?php		
 	
-	function inicializarListas($posicaoAtual, $obstaculos, $posicoesAbertas, $posicoesFechadas){
+	function adicionarNasPosicoesAbertas($posicao, &$posicoesAbertas){
+		array_push($posicoesAbertas, array('posicaoX'=>$posicao[0], 'posicaoY'=>$posicao[1]));
+	}
+	
+	function adicionarNasPosicoesFechadas($posicao, &$posicoesFechadas){		
+		array_push($posicoesFechadas, array($posicao));
+	}
+	
+	function inicializarListas($posicaoAtual, $obstaculos, &$posicoesAbertas, &$posicoesFechadas){
 		adicionarNasPosicoesAbertas($posicaoAtual, $posicoesAbertas);
 		for ($i =0; $i <=count ($obstaculos) - 1; $i++) {
 			adicionarNasPosicoesFechadas($obstaculos[$i], $posicoesFechadas);
 		}
-	}
-	
-	function adicionarNasPosicoesAbertas($posicao, $posicoesAbertas){
-		array_push($posicoesAbertas, array($posicao));
-	}
-	
-	function adicionarNasPosicoesFechadas($posicao, $posicoesFechadas){		
-		array_push($posicoesFechadas, array($posicao));
-	}
+	}	
 	
 	function criarPosicoesAbertas($posicaoAtual, $obstaculos){
 		verificarObstaculos($obstaculos, $posicaoCandidata);
@@ -25,9 +24,14 @@
 	
 	}
 	
-	function descobrirMelhorPosicaoAberta($posicoesAbertas, $custo){
+	function descobrirMelhorPosicaoAberta(&$posicoesAbertas, $objetivo){
+	array_push($posicoesAbertas, array([2, 3]));
+		$custos = array();
 		for($i=0; $i<sizeof($posicoesAbertas); $i++){
 			
+		var_dump($posicoesAbertas[$i]['posicaoX']);
+		var_dump($posicoesAbertas[$i]['posicaoY']);
+			//array_push($custos, custo($posicoesAbertas[$i], $objetivo));	*/}					
 		}
 	}
 	
@@ -47,6 +51,6 @@
 	inicializarListas($posicaoAtual, $obstaculos, $posicoesAbertas, $posicoesFechadas);	
 	
 	$custo = custo($posicaoAtual, $objetivo);
-	/*$melhorPosicaoAberta = descobrirMelhorPosicaoAberta($posicoesAbertas, $custo);
+	$melhorPosicaoAberta = descobrirMelhorPosicaoAberta($posicoesAbertas,  $objetivo);/*
 	moverAgente($posicaoAtual, $melhorPosicaoAberta);
 */
