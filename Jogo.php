@@ -101,4 +101,4 @@
 	inicializarListas($posicaoAtual, $obstaculos, $posicoesAbertas, $posicoesFechadas);	
 	
 	$caminho = astar($posicoesAbertas, $posicoesFechadas, $posicaoAtual,  $objetivo);	
-	imprimir($caminho);	
+	imprimirCaminho($caminho);	
