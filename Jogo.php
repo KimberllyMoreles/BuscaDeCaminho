@@ -25,7 +25,7 @@
 	}	
 	
 	//cria novas posições
-	function criarPosicoesAbertas($posicaoAtual, $posicoesFechadas, &$posicoesAbertas){
+	function criarPosicoesAbertas($posicaoAtual, $posicoesFechadas, &$posicoesAbertas, $espacoPossivel){
 		$posicoesCandidatas = array(4);
 		$posicoesCandidatas[0] = array('posicaoX'=>$posicaoAtual['posicaoX'] - 1, 'posicaoY'=>$posicaoAtual['posicaoY']);
 		$posicoesCandidatas[1] = array('posicaoX'=>$posicaoAtual['posicaoX'] + 1, 'posicaoY'=>$posicaoAtual['posicaoY']);
@@ -33,15 +33,18 @@
 		$posicoesCandidatas[3] = array('posicaoX'=>$posicaoAtual['posicaoX'] , 'posicaoY'=>$posicaoAtual['posicaoY'] + 1);
 		
 		for ($i =0; $i <=count ($posicoesCandidatas) - 1; $i++) {
-			validarPosicoesCandidatas($posicoesFechadas, $posicoesCandidatas[$i], $posicoesAbertas);
+			validarPosicoesCandidatas($posicoesFechadas, $posicoesCandidatas[$i], $posicoesAbertas, $espacoPossivel);
 		}		
 	}
 	
 	//valida as posições criadas pela função que cria as novas posições abertas
 	//verifica se as posições geradas já não estão na lista de posições fechadas
-	function validarPosicoesCandidatas($posicoesFechadas, $posicaoCandidata, &$posicoesAbertas){		
-		if(!(in_array($posicaoCandidata, $posicoesFechadas))){
-			adicionarNasPosicoesAbertas($posicaoCandidata, $posicoesAbertas);
+	function validarPosicoesCandidatas($posicoesFechadas, $posicaoCandidata, &$posicoesAbertas, $espacoPossivel){	
+		if((($posicaoCandidata['posicaoX'] < $espacoPossivel['posicaoX']) && ($posicaoCandidata['posicaoX'] >= 0)) &&
+		(($posicaoCandidata['posicaoY'] < $espacoPossivel['posicaoY']) && ($posicaoCandidata['posicaoY'] >= 0))){		
+			if(!(in_array($posicaoCandidata, $posicoesFechadas))){
+				adicionarNasPosicoesAbertas($posicaoCandidata, $posicoesAbertas);
+			}
 		}
 	}
 	
@@ -53,7 +56,7 @@
 				array_push($custos, custo($posicoesAbertas[$i], $objetivo));
 			}						
 		}
-		return array_search(min($custos), $custos) + 1;			
+		return array_search(min($custos), $custos) + 1;					
 	}
 	
 	//calcula o custo da posição desejada até o objetivo
@@ -78,27 +81,44 @@
 	}
 	
 	//função que faz o caminho
-	function astar(&$posicoesAbertas, &$posicoesFechadas, &$posicaoAtual,  $objetivo){
+	function astar(&$posicoesAbertas, &$posicoesFechadas, &$posicaoAtual,  $objetivo, $espacoPossivel){
 		$caminho = array();	
+		$contador = 0;
 		while($posicaoAtual != $objetivo){
-			criarPosicoesAbertas($posicaoAtual, $posicoesFechadas, $posicoesAbertas);	
-			$melhorPosicaoAberta = $posicoesAbertas[descobrirMelhorPosicaoAberta($posicoesAbertas,  $objetivo, $posicaoAtual)];
-			array_push($caminho, $melhorPosicaoAberta);
-			moverAgente($posicaoAtual, $melhorPosicaoAberta, $posicoesAbertas, $posicoesFechadas);
+			criarPosicoesAbertas($posicaoAtual, $posicoesFechadas, $posicoesAbertas, $espacoPossivel);
+			if(sizeof($posicoesAbertas) > 1){
+				$melhorPosicaoAberta = $posicoesAbertas[descobrirMelhorPosicaoAberta($posicoesAbertas,  $objetivo, $posicaoAtual)];
+				array_push($caminho, $melhorPosicaoAberta);
+				moverAgente($posicaoAtual, $melhorPosicaoAberta, $posicoesAbertas, $posicoesFechadas);
+			}
+			else{
+				if(sizeof($posicoesAbertas) == 1){	
+					array_push($caminho, $posicoesAbertas[0]);
+					moverAgente($posicaoAtual, $melhorPosicaoAberta, $posicoesAbertas, $posicoesFechadas);
+				}
+				else{
+					echo "Não há mais movimentos possíveis no movimento de número $contador<br>";
+					break;
+				}
+			}
+			$contador++;
 		}
 		return $caminho;
 	}
 	
+	$espacoPossivel = array('posicaoX'=>9, 'posicaoY'=>5);
 	$posicoesAbertas = array();
 	$posicoesFechadas = array();
 	$posicaoAtual = array('posicaoX'=>1, 'posicaoY'=>3);
 	$obstaculos = array(
 					array('posicaoX'=>3, 'posicaoY'=>1),
-					array('posicaoX'=>4, 'posicaoY'=>2),
+					array('posicaoX'=>3, 'posicaoY'=>2),
 					array('posicaoX'=>3, 'posicaoY'=>3)
 					);
 	$objetivo = array('posicaoX'=>7, 'posicaoY'=>1);	
 	inicializarListas($posicaoAtual, $obstaculos, $posicoesAbertas, $posicoesFechadas);	
 	
-	$caminho = astar($posicoesAbertas, $posicoesFechadas, $posicaoAtual,  $objetivo);	
+	echo "Posicao Inicial: [".$posicaoAtual['posicaoX']."][".$posicaoAtual['posicaoY']."]<br>";
+	
+	$caminho = astar($posicoesAbertas, $posicoesFechadas, $posicaoAtual,  $objetivo, $espacoPossivel);	
 	imprimirCaminho($caminho);	
